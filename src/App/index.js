@@ -1,5 +1,25 @@
 import React from "react";
 import { Map, fromJS } from "immutable";
+import experiment from "./exp";
+
+function makeNKeyComplexObject(n) {
+  const target = {};
+  let keyCount = n;
+  while (keyCount) {
+    let tempReference = {};
+    target[`key-${keyCount}`] = tempReference;
+    let deepCount = n;
+    while (deepCount) {
+      tempReference = tempReference[`key-${deepCount}`] = {};
+      deepCount--;
+    }
+    keyCount--;
+  }
+  return target;
+}
+
+const complexObject = makeNKeyComplexObject(100);
+console.log(complexObject);
 
 function makeNKeyFlatObject(n) {
   const target = {};
@@ -145,10 +165,15 @@ class App extends React.Component {
     const totalTime = performance.now() - startTime;
     console.log(totalTime / runCount); // 0.05ms
   }
+  clickHandler() {
+    const startTime = performance.now();
+    fromJS(makeNKeyComplexObject);
+    console.log(performance.now() - startTime);
+  }
   render() {
     return (
       <div>
-        <button onClick={this.convertDeepObjectTooMap}>test</button>
+        <button onClick={this.clickHandler}>test</button>
       </div>
     );
   }
