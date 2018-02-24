@@ -1,5 +1,5 @@
 import React from "react";
-import { Map } from "immutable";
+import { Map, fromJS } from "immutable";
 
 function makeNKeyFlatObject(n) {
   const target = {};
@@ -44,7 +44,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
   }
-  objectAssignBenchmark() {
+  makeObjectBenchmark() {
     const startTime = performance.now();
     const runCount = 1000;
     let count = runCount;
@@ -65,10 +65,90 @@ class App extends React.Component {
     const totalTime = performance.now() - startTime;
     console.log(totalTime / runCount);
   }
+  objectAssignBenchmark() {
+    const obj1 = makeNKeyFlatObject(1000);
+    const obj2 = makeNKeyFlatObject(1000);
+
+    const startTime = performance.now();
+    const runCount = 1000;
+    let count = runCount;
+    while (count) {
+      const result = Object.assign({}, obj1, obj2);
+      count--;
+    }
+    const totalTime = performance.now() - startTime;
+    console.log(totalTime / runCount); // 0.7ms
+  }
+  mapMergeBenchmark() {
+    const map1 = makeNKeyFlatMap(1000);
+    const map2 = makeNKeyFlatMap(1000);
+
+    const startTime = performance.now();
+    const runCount = 1000;
+    let count = runCount;
+    while (count) {
+      const result = map1.merge(map2);
+      count--;
+    }
+    const totalTime = performance.now() - startTime;
+    console.log(totalTime / runCount); // 0.2ms
+  }
+  flatMapToJSBenchmark() {
+    const map1 = makeNKeyFlatMap(1000);
+
+    const startTime = performance.now();
+    const runCount = 1000;
+    let count = runCount;
+    while (count) {
+      map1.toJS();
+      count--;
+    }
+    const totalTime = performance.now() - startTime;
+    console.log(totalTime / runCount); // 0.12ms
+  }
+  deepMapToJSBenchmark() {
+    const map1 = makeNkeyDeepMap(100);
+
+    const startTime = performance.now();
+    const runCount = 1000;
+    let count = runCount;
+    while (count) {
+      map1.toJS();
+      count--;
+    }
+    const totalTime = performance.now() - startTime;
+    console.log(totalTime / runCount); // 0.04ms
+  }
+  convertFlatObjectToMap() {
+    const obj1 = makeNKeyFlatObject(1000);
+
+    const startTime = performance.now();
+    const runCount = 1000;
+    let count = runCount;
+    while (count) {
+      fromJS(obj1);
+      count--;
+    }
+    const totalTime = performance.now() - startTime;
+    console.log(totalTime / runCount); // 0.38ms
+  }
+  convertDeepObjectTooMap() {
+    const obj1 = makeNKeyDeepObject(100);
+
+    const startTime = performance.now();
+    const runCount = 1000;
+    let count = runCount;
+    while (count) {
+      fromJS(obj1);
+      count--;
+    }
+    const totalTime = performance.now() - startTime;
+    console.log(totalTime / runCount); // 0.05ms
+  }
   render() {
     return (
       <div>
-        <button onClick={this.objectAssignBenchmark}>Object.assign</button>
+        <button onClick={this.convertDeepObjectTooMap}>test</button>
       </div>
     );
   }
