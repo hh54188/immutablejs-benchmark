@@ -1,6 +1,8 @@
 import React from "react";
 import { Map, fromJS } from "immutable";
 import experiment from "./exp_sample";
+// https://github.com/vigneshshanmugam/react-memorystats
+import MemoryStatsComponent from "react-memorystats";
 
 function makeNKeyComplexObject(n) {
   const target = {};
@@ -179,12 +181,13 @@ class App extends React.Component {
     console.log(totalTime / runCount); // 0.05ms
   }
   clickHandler() {
-    objectAssignMemoryAllocation(1000);
-    // mapAssignMemeoryAllocation(1000);
+    // objectAssignMemoryAllocation(1000);
+    mapAssignMemeoryAllocation(1000);
   }
   render() {
     return (
       <div>
+        <MemoryStatsComponent corner="topRight" />
         <button onClick={this.clickHandler}>test</button>
       </div>
     );

@@ -6318,6 +6318,10 @@ react-lazy-load@^3.0.12:
     lodash.throttle "^4.0.0"
     prop-types "^15.5.8"
 
+react-memorystats@^1.1.0:
+  version "1.1.0"
+  resolved "http://npm.in.zhihu.com/react-memorystats/-/react-memorystats-1.1.0.tgz#9ecd9d9d57c0e4ea23d981f86035221e2004ab87"
+
 react-redux@^5.0.7:
   version "5.0.7"
   resolved "http://npm.in.zhihu.com/react-redux/-/react-redux-5.0.7.tgz#0dc1076d9afb4670f993ffaef44b8f8c1155a4c8"
