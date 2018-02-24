@@ -1,6 +1,6 @@
 import React from "react";
 import { Map, fromJS } from "immutable";
-import experiment from "./exp";
+import experiment from "./exp_sample";
 
 function makeNKeyComplexObject(n) {
   const target = {};
@@ -17,9 +17,6 @@ function makeNKeyComplexObject(n) {
   }
   return target;
 }
-
-const complexObject = makeNKeyComplexObject(100);
-console.log(complexObject);
 
 function makeNKeyFlatObject(n) {
   const target = {};
@@ -58,6 +55,22 @@ function makeNkeyDeepMap(n) {
     n--;
   }
   return target;
+}
+
+function objectAssignMemoryAllocation(times) {
+  let target = { count: 1 };
+  while (times) {
+    target = Object.assign({}, target, { count: target.count + 1 });
+    times--;
+  }
+}
+
+function mapAssignMemeoryAllocation(times) {
+  let target = new Map({ count: 1 });
+  while (times) {
+    target = target.set("count", target.get("count") + 1);
+    times--;
+  }
 }
 
 class App extends React.Component {
@@ -166,9 +179,8 @@ class App extends React.Component {
     console.log(totalTime / runCount); // 0.05ms
   }
   clickHandler() {
-    const startTime = performance.now();
-    fromJS(makeNKeyComplexObject);
-    console.log(performance.now() - startTime);
+    objectAssignMemoryAllocation(1000);
+    // mapAssignMemeoryAllocation(1000);
   }
   render() {
     return (
