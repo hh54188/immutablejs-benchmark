@@ -1,8 +1,5 @@
 import React from "react";
 import { Map, fromJS } from "immutable";
-import experiment from "./exp_sample";
-// https://github.com/vigneshshanmugam/react-memorystats
-import MemoryStatsComponent from "react-memorystats";
 
 function makeNKeyComplexObject(n) {
   const target = {};
@@ -75,119 +72,131 @@ function mapAssignMemeoryAllocation(times) {
   }
 }
 
+function runTaskManyTimes(taskFunction, repeatTimes = 1000) {
+  const startTime = performance.now();
+  let count = repeatTimes;
+  while (count) {
+    taskFunction();
+    count--;
+  }
+  const totalTime = performance.now() - startTime;
+  return totalTime / repeatTimes;
+}
+
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.clickHandler = this.clickHandler.bind(this);
   }
-  makeObjectBenchmark() {
-    const startTime = performance.now();
-    const runCount = 1000;
-    let count = runCount;
-    while (count) {
-      // Flat Object (100):
-      // const originObject = makeNKeyFlatObject(100); // 0.02ms
-      // const originObject = makeNKeyFlatMap(100); // 0.04ms
-
-      // Flat Object (1000):
-      // const originObject = makeNKeyFlatObject(1000); // 0.16ms
-      // const originObject = makeNKeyFlatMap(1000); // 0.38ms
-
-      // Deep Object (1000):
-      // const originObject = makeNKeyDeepObject(100); // 0.015ms
-      // const originObject = makeNkeyDeepMap(100); // 0.33ms
-      count--;
-    }
-    const totalTime = performance.now() - startTime;
-    console.log(totalTime / runCount);
+  makeNKeyFlatObjectBenchmark() {
+    const perOperationCost = runTaskManyTimes(function() {
+      makeNKeyFlatObject(100);
+    });
+    return perOperationCost;
+  }
+  makeNKeyFlatMapBrenchmark() {
+    const perOperationCost = runTaskManyTimes(function() {
+      makeNKeyFlatMap(100);
+    });
+    return perOperationCost;
+  }
+  makeNKeyDeepObjectBenchmark() {
+    const perOperationCost = runTaskManyTimes(function() {
+      makeNKeyDeepObject(100);
+    });
+    return perOperationCost;
+  }
+  makeNKeyDeepMapBenchmark() {
+    const perOperationCost = runTaskManyTimes(function() {
+      makeNKeyDeepObject(100);
+    });
+    return perOperationCost;
   }
   objectAssignBenchmark() {
     const obj1 = makeNKeyFlatObject(1000);
     const obj2 = makeNKeyFlatObject(1000);
 
-    const startTime = performance.now();
-    const runCount = 1000;
-    let count = runCount;
-    while (count) {
-      const result = Object.assign({}, obj1, obj2);
-      count--;
-    }
-    const totalTime = performance.now() - startTime;
-    console.log(totalTime / runCount); // 0.7ms
+    const perOperationCost = runTaskManyTimes(function() {
+      Object.assign({}, obj1, obj2);
+    });
+    return perOperationCost;
   }
   mapMergeBenchmark() {
     const map1 = makeNKeyFlatMap(1000);
     const map2 = makeNKeyFlatMap(1000);
 
-    const startTime = performance.now();
-    const runCount = 1000;
-    let count = runCount;
-    while (count) {
-      const result = map1.merge(map2);
-      count--;
-    }
-    const totalTime = performance.now() - startTime;
-    console.log(totalTime / runCount); // 0.2ms
+    const perOperationCost = runTaskManyTimes(function() {
+      map1.merge(map2);
+    });
+    return perOperationCost;
   }
   flatMapToJSBenchmark() {
     const map1 = makeNKeyFlatMap(1000);
 
-    const startTime = performance.now();
-    const runCount = 1000;
-    let count = runCount;
-    while (count) {
+    const perOperationCost = runTaskManyTimes(function() {
       map1.toJS();
-      count--;
-    }
-    const totalTime = performance.now() - startTime;
-    console.log(totalTime / runCount); // 0.12ms
+    });
+    return perOperationCost;
   }
   deepMapToJSBenchmark() {
     const map1 = makeNkeyDeepMap(100);
 
-    const startTime = performance.now();
-    const runCount = 1000;
-    let count = runCount;
-    while (count) {
+    const perOperationCost = runTaskManyTimes(function() {
       map1.toJS();
-      count--;
-    }
-    const totalTime = performance.now() - startTime;
-    console.log(totalTime / runCount); // 0.04ms
+    });
+    return perOperationCost;
   }
   convertFlatObjectToMap() {
     const obj1 = makeNKeyFlatObject(1000);
 
-    const startTime = performance.now();
-    const runCount = 1000;
-    let count = runCount;
-    while (count) {
+    const perOperationCost = runTaskManyTimes(function() {
       fromJS(obj1);
-      count--;
-    }
-    const totalTime = performance.now() - startTime;
-    console.log(totalTime / runCount); // 0.38ms
+    });
+    return perOperationCost;
   }
   convertDeepObjectTooMap() {
     const obj1 = makeNKeyDeepObject(100);
 
-    const startTime = performance.now();
-    const runCount = 1000;
-    let count = runCount;
-    while (count) {
+    const perOperationCost = runTaskManyTimes(function() {
       fromJS(obj1);
-      count--;
-    }
-    const totalTime = performance.now() - startTime;
-    console.log(totalTime / runCount); // 0.05ms
+    });
+    return perOperationCost;
   }
   clickHandler() {
-    // objectAssignMemoryAllocation(1000);
-    mapAssignMemeoryAllocation(1000);
+    console.log(
+      `Make flat object average cost ${this.makeNKeyFlatObjectBenchmark()}ms`
+    );
+    console.log(
+      `Make flat Map average cost ${this.makeNKeyFlatMapBrenchmark()}ms`
+    );
+
+    console.log(
+      `Make deep object average cost ${this.makeNKeyDeepObjectBenchmark()}ms`
+    );
+    console.log(
+      `Make deep Map average cost ${this.makeNKeyDeepMapBenchmark()}ms`
+    );
+
+    console.log(`Object.assign average cost ${this.objectAssignBenchmark()}ms`);
+    console.log(`Map.merge average cost ${this.mapMergeBenchmark()}ms`);
+
+    console.log(
+      `Convert flat map to JS average cost ${this.flatMapToJSBenchmark()}ms`
+    );
+    console.log(
+      `Convert deep map to JS average cost ${this.deepMapToJSBenchmark()}ms`
+    );
+
+    console.log(
+      `Convert flat object to map average cost ${this.convertFlatObjectToMap()}ms`
+    );
+    console.log(
+      `Convert deep object to map average cost ${this.convertDeepObjectTooMap()}ms`
+    );
   }
   render() {
     return (
       <div>
-        <MemoryStatsComponent corner="topRight" />
         <button onClick={this.clickHandler}>test</button>
       </div>
     );
