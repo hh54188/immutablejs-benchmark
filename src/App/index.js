@@ -1,6 +1,19 @@
 import React from "react";
 import { Map, fromJS } from "immutable";
 
+const TOTAL_COUNT = 100000;
+// const TOTAL_COUNT = 1000;
+
+function generateTodos() {
+  let count = TOTAL_COUNT;
+  const todos = {};
+  while (count) {
+    todos[count.toString()] = { title: `Task ${count}`, completed: false };
+    count--;
+  }
+  return todos;
+}
+
 function makeNKeyComplexObject(n) {
   const target = {};
   let keyCount = n;
@@ -162,37 +175,68 @@ class App extends React.Component {
     });
     return perOperationCost;
   }
+  toggleTodo() {
+    function toggleTodo(todos, id) {
+      return Object.assign({}, todos, {
+        [id]: Object.assign({}, todos[id], {
+          completed: !todos[id].completed
+        })
+      });
+    }
+
+    const todos = generateTodos();
+    const startTime = performance.now();
+    const nextState = toggleTodo(todos, String(TOTAL_COUNT / 2));
+    console.log(performance.now() - startTime);
+    console.log(nextState[String(TOTAL_COUNT / 2)]);
+  }
+  toggleTodoImmutable() {
+    function toggleTodo(todos, id) {
+      return todos.set(id, !todos.getIn([id, "completed"]));
+    }
+
+    const todos = generateTodos();
+    const startConvertTime = performance.now();
+    const state = fromJS(todos);
+    console.log(performance.now() - startConvertTime);
+    const id = String(TOTAL_COUNT / 2);
+    const startTime = performance.now();
+    const nextState = toggleTodo(state, String(TOTAL_COUNT / 2));
+    console.log(performance.now() - startTime);
+  }
   clickHandler() {
-    console.log(
-      `Make flat object average cost ${this.makeNKeyFlatObjectBenchmark()}ms`
-    );
-    console.log(
-      `Make flat Map average cost ${this.makeNKeyFlatMapBrenchmark()}ms`
-    );
+    // this.toggleTodo();
+    this.toggleTodoImmutable();
+    // console.log(
+    //   `Make flat object average cost ${this.makeNKeyFlatObjectBenchmark()}ms`
+    // );
+    // console.log(
+    //   `Make flat Map average cost ${this.makeNKeyFlatMapBrenchmark()}ms`
+    // );
 
-    console.log(
-      `Make deep object average cost ${this.makeNKeyDeepObjectBenchmark()}ms`
-    );
-    console.log(
-      `Make deep Map average cost ${this.makeNKeyDeepMapBenchmark()}ms`
-    );
+    // console.log(
+    //   `Make deep object average cost ${this.makeNKeyDeepObjectBenchmark()}ms`
+    // );
+    // console.log(
+    //   `Make deep Map average cost ${this.makeNKeyDeepMapBenchmark()}ms`
+    // );
 
-    console.log(`Object.assign average cost ${this.objectAssignBenchmark()}ms`);
-    console.log(`Map.merge average cost ${this.mapMergeBenchmark()}ms`);
+    // console.log(`Object.assign average cost ${this.objectAssignBenchmark()}ms`);
+    // console.log(`Map.merge average cost ${this.mapMergeBenchmark()}ms`);
 
-    console.log(
-      `Convert flat map to JS average cost ${this.flatMapToJSBenchmark()}ms`
-    );
-    console.log(
-      `Convert deep map to JS average cost ${this.deepMapToJSBenchmark()}ms`
-    );
+    // console.log(
+    //   `Convert flat map to JS average cost ${this.flatMapToJSBenchmark()}ms`
+    // );
+    // console.log(
+    //   `Convert deep map to JS average cost ${this.deepMapToJSBenchmark()}ms`
+    // );
 
-    console.log(
-      `Convert flat object to map average cost ${this.convertFlatObjectToMap()}ms`
-    );
-    console.log(
-      `Convert deep object to map average cost ${this.convertDeepObjectTooMap()}ms`
-    );
+    // console.log(
+    //   `Convert flat object to map average cost ${this.convertFlatObjectToMap()}ms`
+    // );
+    // console.log(
+    //   `Convert deep object to map average cost ${this.convertDeepObjectTooMap()}ms`
+    // );
   }
   render() {
     return (
